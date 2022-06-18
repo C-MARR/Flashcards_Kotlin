@@ -13,11 +13,22 @@ fun main() {
         else println("Invalid input")
     }
     for (i in 1 .. amount) {
-        println("Card #$i")
-        val term = readln()
-        println("The definition for card #$i:")
-        val definition = readln()
-        flashcardPack.add(Flashcard(term, definition))
+        while (true) {
+            println("Card #$i")
+            val term = readln()
+            println("The definition for card #$i:")
+            val definition = readln()
+            if (flashcardPack.any { it.term == term }) {
+                println("The term \"$term\" already exists. Try again:")
+                continue
+            } else if (flashcardPack.any { it.definition == definition }) {
+                println("The definition \"$definition\" already exists. Try again:")
+                continue
+            }
+            flashcardPack.add(Flashcard(term, definition))
+            break
+        }
+
     }
     flashcardPack.forEach { flashcard ->
         println("Print the definition of \"${flashcard.term}\":")
