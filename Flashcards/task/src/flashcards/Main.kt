@@ -13,29 +13,47 @@ fun main() {
         else println("Invalid input")
     }
     for (i in 1 .. amount) {
+        println("Card #$i")
+        var term: String
         while (true) {
-            println("Card #$i")
-            val term = readln()
-            println("The definition for card #$i:")
-            val definition = readln()
-            if (flashcardPack.any { it.term == term }) {
+            term = readln()
+            if (term.isBlank()) {
+                println("Invalid entry")
+            } else if (flashcardPack.any { it.term == term }) {
                 println("The term \"$term\" already exists. Try again:")
-                continue
+            } else {
+                break
+            }
+        }
+        println("The definition for card #$i:")
+        var definition: String
+        while (true) {
+            definition = readln()
+            if (definition.isBlank()) {
+                println("Invalid entry")
             } else if (flashcardPack.any { it.definition == definition }) {
                 println("The definition \"$definition\" already exists. Try again:")
-                continue
+            } else {
+                break
             }
-            flashcardPack.add(Flashcard(term, definition))
-            break
         }
-
+        flashcardPack.add(Flashcard(term, definition))
     }
     flashcardPack.forEach { flashcard ->
         println("Print the definition of \"${flashcard.term}\":")
-        if (readln() == flashcard.definition)
+        val answer = readln()
+        if (answer == flashcard.definition) {
             println("Correct!")
-        else
-            println("Wrong. The right answer is \"${flashcard.definition}\".")
+        }
+        else {
+            print("Wrong. The right answer is \"${flashcard.definition}\"")
+            val correctCard: Flashcard? = flashcardPack.firstOrNull { it.definition == answer }
+            if (correctCard != null) {
+                println(", but your definition is correct for \"${correctCard.term}\".")
+            } else {
+                println(".")
+            }
+        }
     }
 }
 
