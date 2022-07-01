@@ -1,5 +1,10 @@
 package flashcards
 
+import java.io.BufferedReader
+import java.io.BufferedWriter
+import java.io.FileReader
+import java.io.FileWriter
+
 val flashcardPack = mutableListOf<Flashcard>()
 
 fun main() {
@@ -54,11 +59,41 @@ fun remove() {
 }
 
 fun import() {
-    TODO("Not yet implemented")
+    var count = 0
+    val filename = "data.txt"
+    try {
+        val fileReader = FileReader(filename)
+        val bufferedReader= BufferedReader(fileReader)
+        bufferedReader.lines().forEach { fullLine ->
+            val line = fullLine.split(" :: ")
+            if (line.size == 2
+                && flashcardPack.none { it.term == line[0] }
+                && flashcardPack.none { it.definition  == line[1] }) {
+                flashcardPack.add(Flashcard(line[0], line[1]))
+                count++
+            }
+        }
+        println("$count cards have been loaded.")
+    } catch (e: java.lang.Exception) {
+        println("File not found.")
+    }
 }
 
 fun export() {
-    TODO("Not yet implemented")
+    if (flashcardPack.isEmpty()) {
+        return
+    }
+    val filename = "data.txt"
+    try {
+        val fileWriter = FileWriter(filename)
+        val bufferedWriter = BufferedWriter(fileWriter)
+        flashcardPack.forEach {
+            bufferedWriter.write("${it.term} :: ${it.definition}")
+        }
+        println("${flashcardPack.size} cards have been saved.")
+    } catch (e: java.lang.Exception) {
+        println("Write Error")
+    }
 }
 
 fun ask() {
