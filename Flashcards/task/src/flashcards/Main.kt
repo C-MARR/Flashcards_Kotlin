@@ -1,9 +1,6 @@
 package flashcards
 
-import java.io.BufferedReader
-import java.io.BufferedWriter
-import java.io.FileReader
-import java.io.FileWriter
+import java.io.File
 
 val flashcardPack = mutableListOf<Flashcard>()
 
@@ -29,13 +26,13 @@ fun add() {
     println("The card:")
     val term = readln()
     if (flashcardPack.any { it.term == term }) {
-        println("The term \"$term\" already exists.")
+        println("The card \"$term\" already exists.")
         return
     } else if (term.isBlank()) {
         println("The card cannot be blank")
         return
     }
-    println("The definition for card:")
+    println("The definition of the card:")
     val definition = readln()
     if (flashcardPack.any { it.definition == definition }) {
         println("The definition \"$definition\" already exists:")
@@ -60,11 +57,11 @@ fun remove() {
 
 fun import() {
     var count = 0
-    val filename = "data.txt"
     try {
-        val fileReader = FileReader(filename)
-        val bufferedReader= BufferedReader(fileReader)
-        bufferedReader.lines().forEach { fullLine ->
+        println("File name:")
+        val fileName = readln()
+        val saveFile = File(fileName)
+        saveFile.readLines().forEach { fullLine ->
             val line = fullLine.split(" :: ")
             if (line.size == 2
                 && flashcardPack.none { it.term == line[0] }
@@ -83,12 +80,12 @@ fun export() {
     if (flashcardPack.isEmpty()) {
         return
     }
-    val filename = "data.txt"
     try {
-        val fileWriter = FileWriter(filename)
-        val bufferedWriter = BufferedWriter(fileWriter)
+        println("File name:")
+        val fileName = readln()
+        val saveFile = File(fileName)
         flashcardPack.forEach {
-            bufferedWriter.write("${it.term} :: ${it.definition}")
+            saveFile.appendText("${it.term} :: ${it.definition}\n")
         }
         println("${flashcardPack.size} cards have been saved.")
     } catch (e: java.lang.Exception) {
