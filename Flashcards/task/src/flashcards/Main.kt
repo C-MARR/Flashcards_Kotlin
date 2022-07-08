@@ -4,7 +4,10 @@ import java.io.File
 
 val flashcardPack = mutableListOf<Flashcard>()
 
-fun main() {
+fun main(args: Array<String>) {
+    if (args.contains("-import")) {
+        import(args[args.indexOf("-import") + 1])
+    }
     while (true) {
         println("Input the action (add, remove, import, export, ask, exit):")
         when (readln()) {
@@ -15,6 +18,9 @@ fun main() {
             "ask" -> ask()
             "exit" -> {
                 println("Bye bye!")
+                if (args.contains("-export")) {
+                    export(args[args.indexOf("-export") + 1])
+                }
                 break
             }
             else -> println("Invalid entry")
@@ -56,16 +62,19 @@ fun remove() {
 }
 
 fun import() {
+    println("File name:")
+    val fileName = readln()
+    import(fileName)
+}
+
+fun import(fileName: String) {
     var count = 0
     try {
-        println("File name:")
-        val fileName = readln()
         val saveFile = File(fileName)
         saveFile.readLines().forEach { fullLine ->
             val line = fullLine.split(" :: ")
-            if (line.size == 2
-                && flashcardPack.none { it.term == line[0] }
-                && flashcardPack.none { it.definition  == line[1] }) {
+            if (line.size == 2) {
+                flashcardPack.removeIf { it.term == line[0] }
                 flashcardPack.add(Flashcard(line[0], line[1]))
                 count++
             }
@@ -77,13 +86,18 @@ fun import() {
 }
 
 fun export() {
+    println("File name:")
+    val fileName = readln()
+    export(fileName)
+}
+
+fun export(fileName: String) {
     if (flashcardPack.isEmpty()) {
         return
     }
     try {
-        println("File name:")
-        val fileName = readln()
         val saveFile = File(fileName)
+        saveFile.writeText("")
         flashcardPack.forEach {
             saveFile.appendText("${it.term} :: ${it.definition}\n")
         }
