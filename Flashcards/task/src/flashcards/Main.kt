@@ -9,7 +9,7 @@ fun main(args: Array<String>) {
         import(args[args.indexOf("-import") + 1])
     }
     while (true) {
-        println("Input the action (add, remove, import, export, ask, exit):")
+        println("Input the action (add, remove, import, export, ask, exit, log, hardest card, reset stats):")
         when (readln()) {
             "add" -> add()
             "remove" -> remove()
@@ -23,9 +23,42 @@ fun main(args: Array<String>) {
                 }
                 break
             }
+            "log" -> log()
+            "hardest card" -> hardestCard()
+            "reset stats" -> resetStats()
             else -> println("Invalid entry")
         }
     }
+}
+
+fun resetStats() {
+    flashcardPack.forEach { it.mistakes = 0 }
+    println("Card statistics have been reset.")
+}
+
+fun hardestCard() {
+    var mostMistakes = 0
+    flashcardPack.forEach {
+        if (it.mistakes > mostMistakes) {
+            mostMistakes = it.mistakes
+        }
+    }
+    if (mostMistakes == 0) {
+        println("There are no cards with errors")
+        return
+    }
+    val hardestCards = flashcardPack.filter { it.mistakes == mostMistakes }
+    println("The hardest card"
+            + (if (hardestCards.size > 1) "s are " else " is ")
+            + hardestCards.joinToString { "\"${it.term}\"" }
+            + "."
+            + " You have $mostMistakes error${if (mostMistakes > 1) "s" else ""} answering "
+            + if (hardestCards.size > 1) "them." else "it."
+    )
+}
+
+fun log() {
+    TODO("Not yet implemented")
 }
 
 fun add() {
@@ -47,7 +80,7 @@ fun add() {
         println("The definition cannot be blank")
         return
     }
-    flashcardPack.add(Flashcard(term, definition))
+    flashcardPack.add(Flashcard(term, definition, 0))
     println("The pair (\"$term\":\"$definition\") has been added.")
 }
 
@@ -73,9 +106,9 @@ fun import(fileName: String) {
         val saveFile = File(fileName)
         saveFile.readLines().forEach { fullLine ->
             val line = fullLine.split(" :: ")
-            if (line.size == 2) {
+            if (line.size == 3) {
                 flashcardPack.removeIf { it.term == line[0] }
-                flashcardPack.add(Flashcard(line[0], line[1]))
+                flashcardPack.add(Flashcard(line[0], line[1], line[2].toInt()))
                 count++
             }
         }
@@ -99,7 +132,7 @@ fun export(fileName: String) {
         val saveFile = File(fileName)
         saveFile.writeText("")
         flashcardPack.forEach {
-            saveFile.appendText("${it.term} :: ${it.definition}\n")
+            saveFile.appendText("${it.term} :: ${it.definition} :: ${it.mistakes}\n")
         }
         println("${flashcardPack.size} cards have been saved.")
     } catch (e: java.lang.Exception) {
@@ -133,6 +166,7 @@ fun ask() {
             } else {
                 println(".")
             }
+            randomCard.mistakes++
         }
     }
 }
